@@ -1,0 +1,129 @@
+@startuml classDiagram
+title Assignment Two Class Diagram
+skinparam classAttributeIconSize 0
+
+package edu.curtin.app.main {
+    class Main {
+        +main(String[]): void
+    }
+}
+
+package edu.curtin.app.controller {
+    class SimulationEngine {
+        -towns: Map<String, Town>
+        -railways: List<Railways>
+        -observers: List<Observer>
+        -input: TownsInput
+        -dotGen: DotOutputGenerator
+        -consolePrinter: ConsolePrinter
+        +addObserver(o: Observer): void
+        +run(): void
+    }
+}
+
+package edu.curtin.app.model {
+    class Town {
+        -name: String
+        -population: int
+        -stockpile: int
+        -goodsTransportedToday: int
+        -connections: List<Railways>
+        +getName(): String
+        +getPopulation(): int
+        +setPopulation(int): void
+        +produceGoods(): void
+        +takeGoods(int): int
+        +receiveGoods(int): void
+        +getConnections(): List<Railways>
+        +getStockpile(): int
+        +getGoodsTransportedToday(): int
+    }
+
+    class Railways {
+        -townA: Town
+        -townB: Town
+        -state: RailwayState
+        +stepDay(): void
+        +transportGoods(): int
+        +beginDualTrackUpgrade(): void
+        +setState(RailwayState): void
+        +getState(): RailwayState
+        +getTownA(): Town
+        +getTownB(): Town
+        +connects(String, String): boolean
+        +transferGoods(Town, Town, int): int
+        +getDotLine(): String
+    }
+
+    class TownsInput {
+        +TownsInput()
+        +TownsInput(long)
+        +setErrorProbability(double): void
+        +nextMessage(): String
+    }
+}
+
+package edu.curtin.app.state {
+    interface RailwayState {
+        +stepDay(Railways): void
+        +transport(Railways): int
+        +getDotFormat(): String
+    }
+
+    class SingleTrackUnderConstruction {
+        -daysRemaining: int
+    }
+
+    class SingleTrackOperational {
+        -directionAtoB: boolean
+        -townA: Town
+        -townB: Town
+    }
+
+    class DualTrackUnderConstruction {
+        -daysRemaining: int
+    }
+
+    class DualTrackOperational {}
+
+    RailwayState <|.. SingleTrackUnderConstruction
+    RailwayState <|.. SingleTrackOperational
+    RailwayState <|.. DualTrackUnderConstruction
+    RailwayState <|.. DualTrackOperational
+}
+
+package edu.curtin.app.event {
+    interface Observer {
+        +update(String): void
+    }
+
+    class ConsoleLogger {
+        -log: Logger
+        +update(String): void
+    }
+
+    Observer <|.. ConsoleLogger
+}
+
+package edu.curtin.app.view {
+    class ConsolePrinter {
+        +print(Map<String, Town>, int): void
+    }
+
+    class DotOutputGenerator {
+        +generateDot(Map<String, Town>, List<Railways>): void
+    }
+}
+
+Main --> SimulationEngine
+SimulationEngine --> Observer
+SimulationEngine --> TownsInput
+SimulationEngine --> DotOutputGenerator
+SimulationEngine --> ConsolePrinter
+SimulationEngine --> Town
+SimulationEngine --> Railways
+Railways --> RailwayState
+Railways --> Town
+Town --> Railways
+
+@enduml

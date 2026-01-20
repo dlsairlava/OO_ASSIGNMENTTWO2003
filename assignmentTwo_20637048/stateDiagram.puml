@@ -1,0 +1,40 @@
+@startuml stateDiagram
+title Railway Construction State Flow Diagram
+
+[*] --> UnderConstruction : "railway-construction\n(5 day delay)"
+
+state UnderConstruction {
+  UnderConstruction --> SingleTrack : after 5 days
+}
+
+note right of UnderConstruction
+  Newly created railway
+  Not usable until construction completes
+end note
+
+state SingleTrack {
+  [*] --> DirectionAToB : "Day n (even)"
+  DirectionAToB --> DirectionBToA : "Day n+1 (odd)"
+  DirectionBToA --> DirectionAToB : "Day n+2 (even)"
+}
+
+SingleTrack --> UpgradingToDualTrack : "railway-duplication\ntriggered"
+
+state UpgradingToDualTrack {
+  UpgradingToDualTrack --> DualTrack : after 5 days
+}
+
+note right of UpgradingToDualTrack
+  Railway continues to function
+  in single direction during upgrade
+end note
+
+state DualTrack {
+  [*] --> BiDirectional : "available both directions"
+}
+
+@enduml
+
+
+
+
